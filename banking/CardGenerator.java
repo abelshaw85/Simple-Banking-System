@@ -28,6 +28,7 @@ public class CardGenerator {
         return pin;
     }
 
+    //generate checksum using luhn's algorithm
     private static int generateChecksum(String cardNumber) {
         int sum = 0;
         for (int i = 0; i < cardNumber.length(); i++) {
