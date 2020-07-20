@@ -1,5 +1,11 @@
 package banking;
 
+import org.sqlite.SQLiteDataSource;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,10 +14,12 @@ public class Bank {
     private String issuerIdentificationNumber;
     private final int IIN_LENGTH = 6;
     private final int ACCOUNT_NUMBER_LENGTH = 9;
+    private final String dbUrl;
 
-    public Bank(String issuerIdentificationNumber) {
+    public Bank(String issuerIdentificationNumber, String dbUrl) {
         this.issuerIdentificationNumber = issuerIdentificationNumber;
         this.accounts = new HashMap();
+        this.dbUrl = dbUrl;
     }
 
     public void addAccount(Account newAccount) {
@@ -23,6 +31,24 @@ public class Bank {
         if (accountToAddCardTo == null) {
             System.out.println("Account not in database.");
         } else {
+            String sql = "INSERT INTO card (number, pin, balance) VALUES (\n"
+                    + card.getCardNumber() + ",\n"
+                    + card.getPin() + ",\n"
+                    + "0\n"
+                    + ");";
+
+            SQLiteDataSource dataSource = new SQLiteDataSource();
+            dataSource.setUrl(dbUrl);
+
+            try (Connection conn = DriverManager.getConnection(dbUrl);
+                 Statement stmt = conn.createStatement()) {
+                // add new card
+                stmt.execute(sql);
+//            stmt.addBatch(sql2);
+//                stmt.executeBatch();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
             accountToAddCardTo.addCard(card);
         }
     }

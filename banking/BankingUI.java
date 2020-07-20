@@ -6,9 +6,9 @@ public class BankingUI {
     Scanner scanner;
     Bank bank;
 
-    public BankingUI(Scanner scanner) {
+    public BankingUI(Scanner scanner, String dbUrl) {
         this.scanner = scanner;
-        this.bank = new Bank("400000");
+        this.bank = new Bank("400000", dbUrl);
     }
 
     public void start() {
