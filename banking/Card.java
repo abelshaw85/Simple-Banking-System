@@ -10,6 +10,11 @@ public class Card {
         this.pin = pin;
     }
 
+    public Card(String cardNumber, String pin, int balance) {
+        this(cardNumber, pin);
+        this.balance = balance;
+    }
+
     public String getCardNumber() {
         return cardNumber;
     }

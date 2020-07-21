@@ -2,18 +2,23 @@ package banking;
 
 public class Account {
     private String accountNumber;
-    private Card card;
+    private String cardNumber;
 
     public Account(String accountNumber) {
         this.accountNumber = accountNumber;
     }
 
-    public void addCard(Card card) {
-        this.card = card;
+    public Account(String accountNumber, String cardNumber) {
+        this(accountNumber);
+        this.cardNumber = cardNumber;
     }
 
-    public Card getCard() {
-        return this.card;
+    public void addCard(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public String getCard() {
+        return this.cardNumber;
     }
 
     public String getAccountNumber() {
