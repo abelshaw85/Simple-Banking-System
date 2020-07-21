@@ -1,8 +1,8 @@
 package banking;
 
 public class Card {
-    private String cardNumber;
-    private String pin;
+    final private String cardNumber;
+    final private String pin;
     private int balance = 0;
 
     public Card(String cardNumber, String pin) {
@@ -16,14 +16,14 @@ public class Card {
     }
 
     public String getCardNumber() {
-        return cardNumber;
+        return this.cardNumber;
     }
 
     public String getPin() {
-        return pin;
+        return this.pin;
     }
 
     public int getBalance() {
-        return balance;
+        return this.balance;
     }
 }

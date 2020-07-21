@@ -39,4 +39,12 @@ public class Database {
         Statement stmt = conn.createStatement();
         return stmt.executeQuery(sql);
     }
+
+    public void close() {
+        try {
+            this.conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

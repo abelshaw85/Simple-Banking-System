@@ -1,6 +1,5 @@
 package banking;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class CardGenerator {
@@ -8,11 +7,9 @@ public class CardGenerator {
 
     private CardGenerator() { }
 
-    public static Card generateCard(Bank bank, Account account) {
-        String cardNumber = bank.getIssuerIdentificationNumber() +
-                account.getAccountNumber();
+    public static Card generateCard(Bank bank, String accNumber) {
+        String cardNumber = bank.getIssuerIdentificationNumber() + accNumber;
         cardNumber += generateChecksum(cardNumber);
-
         String pin = generatePin();
         return new Card(cardNumber, pin);
     }
@@ -26,6 +23,12 @@ public class CardGenerator {
             pin = "0" + pin;
         }
         return pin;
+    }
+
+    public static boolean verifyChecksum(String cardNumber) {
+        int givenChecksum = Character.getNumericValue(cardNumber.charAt(cardNumber.length() - 1));
+        int actualChecksum = generateChecksum(cardNumber.substring(0, cardNumber.length() - 1)); //removes last digit
+        return givenChecksum == actualChecksum;
     }
 
     //generate checksum using luhn's algorithm

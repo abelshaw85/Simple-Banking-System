@@ -1,7 +1,5 @@
 package banking;
 
-import org.sqlite.SQLiteDataSource;
-
 import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
@@ -41,25 +39,13 @@ public class Bank {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-//        String sql = "CREATE TABLE IF NOT EXISTS card (\n" +
-//                "id INTEGER PRIMARY KEY,\n" +
-//                "number TEXT,\n" +
-//                "pin TEXT,\n" +
-//                "balance INTEGER DEFAULT 0" +
-//                ");";
-//        try {
-//            db.submitSQL(sql);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
     }
 
     public void addAccount(Account newAccount) {
         try {
             this.db.submitSQL("INSERT INTO account (number) VALUES (\n" +
-                            newAccount.getAccountNumber() + "\n" +
-                            ");"
+                    "'" + newAccount.getAccountNumber() + "'\n" +
+                    ");"
             );
         } catch (SQLException e) {
             e.printStackTrace();
@@ -68,76 +54,113 @@ public class Bank {
         this.accounts.put(newAccount.getAccountNumber(), newAccount);
     }
 
-    public void addCard(String accNumber, Card card) {
-        Account accountToAddCardTo = findAccount(accNumber);
-        if (accountToAddCardTo == null) {
-            System.out.println("Account not in database.");
-        } else {
-            try {
-                this.db.submitSQL("INSERT INTO card (number, pin, balance) VALUES (\n" +
-                                card.getCardNumber() + ",\n" +
-                                card.getPin() + ",\n" +
-                                "0\n" +
-                                ");"
-                );
-                accountToAddCardTo.addCard(card.getCardNumber());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+    public void addCard(Card card) {
+        try {
+            this.db.submitSQL("INSERT INTO card (number, pin, balance) VALUES (\n" +
+                    "'" + card.getCardNumber() + "',\n" +
+                    "'" + card.getPin() + "',\n" +
+                    "0\n" +
+                    ");"
+            );
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
+
 
     public Account findAccount(String accountNumber) {
         try {
             ResultSet rs = this.db.select("SELECT * FROM account WHERE number='" + accountNumber + "';");
-            if (!rs.next()) {
-                return null;
+            if (rs.next()) {
+                return new Account(rs.getString("number"), rs.getString("card_number"));
             }
-            return new Account(rs.getString("number"), rs.getString("card_number"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private Card findCardByCardNumber(String cardNumber) {
-//        if (cardNumber.length() == IIN_LENGTH + ACCOUNT_NUMBER_LENGTH + 1) {
-//            String cardIIN = cardNumber.substring(0, IIN_LENGTH);
-//            String accNumber = cardNumber.substring(IIN_LENGTH, cardNumber.length() - 1);
-//            if (!this.issuerIdentificationNumber.equals(cardIIN)) {
-//                System.out.println("Card does not belong to this bank.");
-//                System.out.println(this.issuerIdentificationNumber + " " + cardIIN);
-//                return null;
-//            }
-//            Account account = findAccount(accNumber);
-//            if (account == null) {
-//                System.out.println("Account not in database.");
-//                return null;
-//            }
-//            Card card = account.getCard();
-//            if (card != null && card.getCardNumber().equals(cardNumber)) {
-//                return card;
-//            }
-//        }
+    public Card findCardByCardNumber(String cardNumber) {
         String sql = "SELECT * FROM card WHERE number='" + cardNumber + "';";
         try {
             ResultSet rs = this.db.select(sql);
-            if (!rs.next()) {
-                return null;
+            if (rs.next()) {
+                return new Card(rs.getString("number"), rs.getString("pin"), rs.getInt("balance"));
             }
-            return new Card(rs.getString("number"), rs.getString("pin"), rs.getInt("balance"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void transfer(Card sender, Card receiver, int amount) {
+        try {
+            this.db.submitSQL(List.of(
+                    "UPDATE card " +
+                            "SET balance = balance - " + amount + "\n" +
+                            "WHERE number='" + sender.getCardNumber() + "';",
+                    "UPDATE card " +
+                            "SET balance = balance + " + amount + "\n" +
+                            "WHERE number='" + receiver.getCardNumber() + "';"
+            ));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addIncomeToCard(Card card, int amount) {
+        String sql = "UPDATE card\n" +
+                "SET balance = balance + " + amount + "\n" +
+                "WHERE number='" + card.getCardNumber() + "';";
+        try {
+            this.db.submitSQL(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getBalance(Card card) {
+        String sql = "SELECT balance FROM card WHERE number='" + card.getCardNumber() + "';";
+        try {
+            ResultSet rs = this.db.select(sql);
+            if (rs.next()) {
+                return rs.getInt("balance");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Card not found");
+        return -1;
     }
 
     public Card verifyDetails(String cardNumber, String pin) {
         Card card = findCardByCardNumber(cardNumber);
-        return card != null && card.getPin().equals(pin) ? card : null;
+        if (card != null && card.getPin().equals(pin)) {
+            return card;
+        } else if (card == null) {
+            System.out.println("Card not found.");
+        } else {
+            System.out.println("Pin incorrect.");
+        }
+        return null;
+    }
+
+    public void closeAccount(Card card) {
+        try {
+            this.db.submitSQL(
+                    "DELETE FROM card " +
+                            "WHERE number='" + card.getCardNumber() + "';");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getIssuerIdentificationNumber() {
         return this.issuerIdentificationNumber;
+    }
+
+    public void closeDB() {
+        this.db.close();
     }
 }
