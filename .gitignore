@@ -1,0 +1,8 @@
+/bankdb
+/target
+/banking-system_lib
+/.settings
+/bin
+dependency-reduced-pom.xml
+build.fxbuild
+derby.log
