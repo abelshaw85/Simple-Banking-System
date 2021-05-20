@@ -4,7 +4,7 @@ The Banking System is a simple JavaFX application to simulate the generation of 
 ## About Card Numbers ##
 A bank card is broken down as follows:
 
-[Example Card](readme-images/example-card.png)
+![Example Card](readme-images/example-card.png)
 
 - **System Number**: This identifies the type of card we are using. The most common numbers are 4 (Visa) and 5 (Mastercard).
 	
@@ -19,15 +19,15 @@ For this banking system, we have 2 fictional banks, each with their own IIN. Whe
 ## How to Use ##
 When the app is opened, you will be presented with an account registration screen:
 
-[Start of Application](readme-images/start.png)
+![Start of Application](readme-images/start.png)
 
 Enter a username and password and select a bank. Once you click register, you will be shown your account number and randomly generated PIN. You should keep a note of this PIN to access the other features on the app.
 
-[Card Added](readme-images/progress.png)
+![Card Added](readme-images/progress.png)
 
 If you visit the 'Cash Machine' tab, you will be presented with an ATM interface and a list of your generated cards. Select the 'insert' button to simulate the insertion of your card, and then enter the PIN for that card when prompted. Confirmation of the PIN entry is performed by pressing the green CONFIRM button.
 
-[Cash Machine](readme-images/added.png)
+![Cash Machine](readme-images/added.png)
 
 Once inserted, the interface responds in a similar fashion to an ATM. When options appear, pressing the button to the side of that option will trigger that action.
 Actions that can be performed:
